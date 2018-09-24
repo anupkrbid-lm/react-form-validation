@@ -2,20 +2,41 @@ import React from 'react';
 
 const formElement = props => {
   let inputElement = null;
+  const tempProps = JSON.parse(JSON.stringify(props.element));
+  const changed = props.element.changed;
+  delete tempProps.changed;
 
   switch (props.elementType) {
-    case 'input': 
-      inputElement = <input {...props.element} />;
+    case 'input':
+      inputElement = (
+        <input {...tempProps} 
+          onChange={event => {
+            event.persist();
+            changed(event);
+          }} />
+        );
       break
-    case 'select': 
-      const tempProps = JSON.parse(JSON.stringify(props.element));
+    case 'select':
       delete tempProps.options;
       delete tempProps.value;
-      const inputElementOptions =  props.element.options.map(option => <option key={option.value} value={option.value}>{option.name}</option>);
-      inputElement =  <select defaultValue={props.element.value} {...tempProps}>{inputElementOptions}</select>;
+      const inputElementOptions = props.element.options.map(option => <option key={option.value} value={option.value}>{option.name}</option>);
+      inputElement = (
+        <select defaultValue={props.element.value} 
+          {...tempProps}  
+          onChange={event => {
+            event.persist();
+            changed(event);
+          }}>{inputElementOptions}</select>
+      );
       break
     default:
-      inputElement = <input {...props.element} />;
+      inputElement = (
+        <input {...tempProps} 
+          onChange={event => {
+            event.persist();
+            changed(event);
+          }} />
+      );
   }
 
   return (

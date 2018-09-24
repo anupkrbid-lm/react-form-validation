@@ -14,10 +14,12 @@ class App extends Component {
         },
         element: {
           id: 'name',
+          name: 'name',
           type: 'text',
           placeholder: 'Your Name',
           className: 'form-control',
           value: 'Anup',
+          changed: this.formElementChangeHandler.bind(this)
         }
       },
       email: {
@@ -29,9 +31,11 @@ class App extends Component {
         element: {
           id: 'email',
           type: 'text',
+          name: 'email',
           placeholder: 'Your Email',
           className: 'form-control',
           value: 'anupkumar.bid@learningmate.com',
+          changed: this.formElementChangeHandler.bind(this)
         }
       },
       deliveryMethod: {
@@ -44,6 +48,8 @@ class App extends Component {
           id: 'delivery_method',
           className: 'form-control',
           value: 'fastest',
+          name: 'deliveryMethod',
+          changed: this.formElementChangeHandler.bind(this),
           options: [
             { name: 'cheapest', value: 'cheapest' },
             { name: 'fastest', value: 'fastest' }
@@ -52,6 +58,32 @@ class App extends Component {
       }
     }
   };
+
+  formElementChangeHandler(event) {
+    const updatedForm = {
+        ...this.state.form,
+        [event.target.name]: {
+          ...this.state.form[event.target.name],
+          element: {
+            ...this.state.form[event.target.name].element,
+            value: event.target.value
+          }
+        }
+    };
+
+    this.setState({form: updatedForm});
+    // updatedFormElement.value = event.target.value;
+    // updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
+    // updatedFormElement.touched = true;
+    // updatedOrderForm[inputIdentifier] = updatedFormElement;
+    
+    // let formIsValid = true;
+    // for (let inputIdentifier in updatedOrderForm) {
+    //     formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid;
+    // }
+    // this.setState({orderForm: updatedOrderForm, formIsValid: formIsValid});
+
+  }
 
   render() {
     const formElements = [];

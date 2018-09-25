@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import Form from './UI/Form/Form';
 import FormElement from './UI/FormElement/FormElement';
+import Modal from './UI/Modal/Modal';
 
 class App extends Component {
   state = {
@@ -80,7 +81,9 @@ class App extends Component {
       state: {
         valid: false
       }
-    }
+    },
+    showModal: false,
+    formData: {}
   };
 
   checkValidity(value, rules) {
@@ -140,16 +143,21 @@ class App extends Component {
       formIsValid = updatedForm.controls[key].state.valid && formIsValid;
     }
     updatedForm.state.valid = formIsValid;
-
+    
     this.setState({form: updatedForm});
   }
 
   formSubmitHandler(event) {
     event.preventDefault();
     const form = {};
-    for (let key in this.state.form) {
+    for (let key in this.state.form.controls) {
       form[key] = this.state.form.controls[key].element.value
     }
+    this.setState({ showModal: true, formData: form });
+  }
+
+  closeModalHandler() {
+    this.setState({ showModal: false });
   }
 
   render() {
@@ -162,12 +170,24 @@ class App extends Component {
         />
       );
     }
-    
+
+    let modal = null;
+    if (this.state.showModal) {
+      modal = (
+        <Modal
+          header="My Modal"
+          closeModal={this.closeModalHandler.bind(this)}>
+            <pre>{JSON.stringify(this.state.formData)}</pre>
+        </Modal>
+      );
+    }
+
     return (
       <div className="App">
         <Form formState={this.state.form.state} formSubmit={this.formSubmitHandler.bind(this)}>
           {formElements}
         </Form>
+        {modal}
       </div>
     );
   }

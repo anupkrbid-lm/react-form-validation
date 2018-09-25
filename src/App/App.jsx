@@ -5,6 +5,7 @@ import FormElement from './UI/FormElement/FormElement';
 
 class App extends Component {
   state = {
+    formIsValid: false,
     form: {
       name: {
         elementType: 'input',
@@ -23,7 +24,8 @@ class App extends Component {
         validation: {
           required: true
         },
-        valid: false
+        valid: false,
+        dirty: false
       },
       email: {
         elementType: 'input',
@@ -40,9 +42,11 @@ class App extends Component {
           changed: this.formElementChangeHandler.bind(this)
         },
         validation: {
-          required: true
+          required: true,
+          isEmail: true
         },
-        valid: false
+        valid: false,
+        dirty: false
       },
       deliveryMethod: {
         elementType: 'select',
@@ -63,7 +67,8 @@ class App extends Component {
         validation: {
           required: true
         },
-        valid: true
+        valid: true,
+        dirty: false
       }
     }
   };
@@ -105,6 +110,7 @@ class App extends Component {
         ...this.state.form,
         [event.target.name]: {
           ...this.state.form[event.target.name],
+          dirty: true,
           valid: this.checkValidity(event.target.value, this.state.form[event.target.name].validation),
           element: {
             ...this.state.form[event.target.name].element,
@@ -112,8 +118,14 @@ class App extends Component {
           }
         }
     };
-    console.log(updatedForm[event.target.name]);
-    this.setState({form: updatedForm});
+   
+    let formIsValid = true;
+
+    for (let key in updatedForm) {
+      formIsValid = updatedForm[key].valid && formIsValid;
+    }
+
+    this.setState({form: updatedForm, formIsValid: formIsValid});
   }
 
   formSubmitHandler(event) {
@@ -133,7 +145,7 @@ class App extends Component {
     
     return (
       <div className="App">
-        <Form formSubmit={this.formSubmitHandler.bind(this)}>
+        <Form formIsValid={this.state.formIsValid} formSubmit={this.formSubmitHandler.bind(this)}>
           {formElements}
         </Form>
       </div>

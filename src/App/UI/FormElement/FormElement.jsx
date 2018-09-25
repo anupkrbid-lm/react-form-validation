@@ -7,10 +7,17 @@ const formElement = props => {
   delete tempProps.changed;
 
   const inputElementClassList = ['form-control'];
-  if (props.valid) {
-    inputElementClassList.push('valid');
+
+  if (props.dirty) {
+    inputElementClassList.push('form-control-dirty');
   } else {
-    inputElementClassList.push('invalid');
+    inputElementClassList.push('form-control-prestin');
+  }
+
+  if (props.valid) {
+    inputElementClassList.push('form-control-valid');
+  } else if (props.dirty && !props.valid) {
+    inputElementClassList.push('form-control-invalid');
   }
 
   switch (props.elementType) {
@@ -30,6 +37,7 @@ const formElement = props => {
       const inputElementOptions = props.element.options.map(option => <option key={option.value} value={option.value}>{option.name}</option>);
       inputElement = (
         <select defaultValue={props.element.value} 
+          className={inputElementClassList.join(' ')} 
           {...tempProps}  
           onChange={event => {
             event.persist();

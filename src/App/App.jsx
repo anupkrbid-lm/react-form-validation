@@ -5,70 +5,80 @@ import FormElement from './UI/FormElement/FormElement';
 
 class App extends Component {
   state = {
-    formIsValid: false,
     form: {
-      name: {
-        elementType: 'input',
-        label: {
-          for: 'name',
-          value: 'Name'
+      controls: {
+        name: {
+          elementType: 'input',
+          label: {
+            for: 'name',
+            value: 'Name'
+          },
+          element: {
+            id: 'name',
+            name: 'name',
+            type: 'text',
+            placeholder: 'Your Name',
+            value: '',
+            changed: this.formElementChangeHandler.bind(this)
+          },
+          validation: {
+            required: true
+          },
+          state: {
+            valid: false,
+            dirty: false
+          }
         },
-        element: {
-          id: 'name',
-          name: 'name',
-          type: 'text',
-          placeholder: 'Your Name',
-          value: '',
-          changed: this.formElementChangeHandler.bind(this)
+        email: {
+          elementType: 'input',
+          label: {
+            for: 'email',
+            value: 'Email'
+          },
+          element: {
+            id: 'email',
+            type: 'text',
+            name: 'email',
+            placeholder: 'Your Email',
+            value: '',
+            changed: this.formElementChangeHandler.bind(this)
+          },
+          validation: {
+            required: true,
+            isEmail: true
+          },
+          state: {
+            valid: false,
+            dirty: false
+          }
         },
-        validation: {
-          required: true
-        },
-        valid: false,
-        dirty: false
+        deliveryMethod: {
+          elementType: 'select',
+          label: {
+            for: 'delivery_method',
+            value: 'Delivery Method'
+          },
+          element: {
+            id: 'delivery_method',
+            value: 'fastest',
+            name: 'deliveryMethod',
+            changed: this.formElementChangeHandler.bind(this),
+            options: [
+              { name: 'cheapest', value: 'cheapest' },
+              { name: 'fastest', value: 'fastest' }
+            ]
+          },
+          validation: {
+            required: true
+          },
+          state: {
+            valid: true,
+            dirty: false
+          }
+        }
       },
-      email: {
-        elementType: 'input',
-        label: {
-          for: 'email',
-          value: 'Email'
-        },
-        element: {
-          id: 'email',
-          type: 'text',
-          name: 'email',
-          placeholder: 'Your Email',
-          value: '',
-          changed: this.formElementChangeHandler.bind(this)
-        },
-        validation: {
-          required: true,
-          isEmail: true
-        },
-        valid: false,
-        dirty: false
-      },
-      deliveryMethod: {
-        elementType: 'select',
-        label: {
-          for: 'delivery_method',
-          value: 'Delivery Method'
-        },
-        element: {
-          id: 'delivery_method',
-          value: 'fastest',
-          name: 'deliveryMethod',
-          changed: this.formElementChangeHandler.bind(this),
-          options: [
-            { name: 'cheapest', value: 'cheapest' },
-            { name: 'fastest', value: 'fastest' }
-          ]
-        },
-        validation: {
-          required: true
-        },
-        valid: true,
-        dirty: false
+      state: {
+        valid: false
       }
     }
   };
@@ -107,45 +117,55 @@ class App extends Component {
 
   formElementChangeHandler(event) {
     const updatedForm = {
-        ...this.state.form,
+      ...this.state.form,
+      controls: {
+        ...this.state.form.controls,
         [event.target.name]: {
-          ...this.state.form[event.target.name],
-          dirty: true,
-          valid: this.checkValidity(event.target.value, this.state.form[event.target.name].validation),
+          ...this.state.form.controls[event.target.name],
           element: {
-            ...this.state.form[event.target.name].element,
+            ...this.state.form.controls[event.target.name].element,
             value: event.target.value
+          },
+          state: {
+            ...this.state.form.controls[event.target.name].state,
+            dirty: true,
+            valid: this.checkValidity(event.target.value, this.state.form.controls[event.target.name].validation),
           }
         }
+      }
     };
    
     let formIsValid = true;
-
-    for (let key in updatedForm) {
-      formIsValid = updatedForm[key].valid && formIsValid;
+    for (let key in updatedForm.controls) {
+      formIsValid = updatedForm.controls[key].state.valid && formIsValid;
     }
+    updatedForm.state.valid = formIsValid;
 
-    this.setState({form: updatedForm, formIsValid: formIsValid});
+    this.setState({form: updatedForm});
   }
 
   formSubmitHandler(event) {
     event.preventDefault();
     const form = {};
     for (let key in this.state.form) {
-      form[key] = this.state.form[key].element.value
+      form[key] = this.state.form.controls[key].element.value
     }
-    console.log(form);
   }
 
   render() {
     const formElements = [];
-    for (let key in this.state.form) {
-      formElements.push(<FormElement key={this.state.form[key].element.id} {...this.state.form[key]} />);
+    for (let key in this.state.form.controls) {
+      formElements.push(
+        <FormElement 
+          key={this.state.form.controls[key].element.id} 
+          {...this.state.form.controls[key]} 
+        />
+      );
     }
     
     return (
       <div className="App">
-        <Form formIsValid={this.state.formIsValid} formSubmit={this.formSubmitHandler.bind(this)}>
+        <Form formState={this.state.form.state} formSubmit={this.formSubmitHandler.bind(this)}>
           {formElements}
         </Form>
       </div>

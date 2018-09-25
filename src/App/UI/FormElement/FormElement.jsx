@@ -8,15 +8,15 @@ const formElement = props => {
 
   const inputElementClassList = ['form-control'];
 
-  if (props.dirty) {
+  if (props.state.dirty) {
     inputElementClassList.push('form-control-dirty');
   } else {
     inputElementClassList.push('form-control-prestin');
   }
 
-  if (props.valid) {
+  if (props.state.valid) {
     inputElementClassList.push('form-control-valid');
-  } else if (props.dirty && !props.valid) {
+  } else if (props.state.dirty && !props.state.valid) {
     inputElementClassList.push('form-control-invalid');
   }
 

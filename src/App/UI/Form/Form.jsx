@@ -7,7 +7,7 @@ const form = props => (
         <div className="form-group">
           <button
             type="submit"
-            disabled={!props.formIsValid}
+            disabled={!props.valid}
             className="btn btn-primary">
             Submit
           </button>

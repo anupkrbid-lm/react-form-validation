@@ -6,10 +6,18 @@ const formElement = props => {
   const changed = props.element.changed;
   delete tempProps.changed;
 
+  const inputElementClassList = ['form-control'];
+  if (props.valid) {
+    inputElementClassList.push('valid');
+  } else {
+    inputElementClassList.push('invalid');
+  }
+
   switch (props.elementType) {
     case 'input':
       inputElement = (
-        <input {...tempProps} 
+        <input {...tempProps}
+          className={inputElementClassList.join(' ')} 
           onChange={event => {
             event.persist();
             changed(event);

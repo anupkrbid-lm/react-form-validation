@@ -1,8 +1,9 @@
 import React from 'react';
 
 const form = props => (
-    <form>
+    <form onSubmit={props.formSubmit}>
       {props.children}
+      <button type="submit">Submit</button>
     </form>
   );
 

@@ -17,10 +17,13 @@ class App extends Component {
           name: 'name',
           type: 'text',
           placeholder: 'Your Name',
-          className: 'form-control',
-          value: 'Anup',
+          value: '',
           changed: this.formElementChangeHandler.bind(this)
-        }
+        },
+        validation: {
+          required: true
+        },
+        valid: false
       },
       email: {
         elementType: 'input',
@@ -33,10 +36,13 @@ class App extends Component {
           type: 'text',
           name: 'email',
           placeholder: 'Your Email',
-          className: 'form-control',
-          value: 'anupkumar.bid@learningmate.com',
+          value: '',
           changed: this.formElementChangeHandler.bind(this)
-        }
+        },
+        validation: {
+          required: true
+        },
+        valid: false
       },
       deliveryMethod: {
         elementType: 'select',
@@ -46,7 +52,6 @@ class App extends Component {
         },
         element: {
           id: 'delivery_method',
-          className: 'form-control',
           value: 'fastest',
           name: 'deliveryMethod',
           changed: this.formElementChangeHandler.bind(this),
@@ -54,35 +59,70 @@ class App extends Component {
             { name: 'cheapest', value: 'cheapest' },
             { name: 'fastest', value: 'fastest' }
           ]
-        }
+        },
+        validation: {
+          required: true
+        },
+        valid: true
       }
     }
   };
+
+  checkValidity(value, rules) {
+    let isValid = true;
+
+    if (!rules) {
+        return true;
+    }
+    
+    if (rules.required) {
+        isValid = value.trim() !== '' && isValid;
+    }
+
+    if (rules.minLength) {
+        isValid = value.trim().length >= rules.minLength && isValid
+    }
+
+    if (rules.maxLength) {
+        isValid = value.trim().length <= rules.maxLength && isValid
+    }
+
+    if (rules.isEmail) {
+        const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+        isValid = pattern.test(value) && isValid
+    }
+
+    if (rules.isNumeric) {
+        const pattern = /^\d+$/;
+        isValid = pattern.test(value) && isValid
+    }
+
+    return isValid;
+  }
 
   formElementChangeHandler(event) {
     const updatedForm = {
         ...this.state.form,
         [event.target.name]: {
           ...this.state.form[event.target.name],
+          valid: this.checkValidity(event.target.value, this.state.form[event.target.name].validation),
           element: {
             ...this.state.form[event.target.name].element,
             value: event.target.value
           }
         }
     };
-
+    console.log(updatedForm[event.target.name]);
     this.setState({form: updatedForm});
-    // updatedFormElement.value = event.target.value;
-    // updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
-    // updatedFormElement.touched = true;
-    // updatedOrderForm[inputIdentifier] = updatedFormElement;
-    
-    // let formIsValid = true;
-    // for (let inputIdentifier in updatedOrderForm) {
-    //     formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid;
-    // }
-    // this.setState({orderForm: updatedOrderForm, formIsValid: formIsValid});
+  }
 
+  formSubmitHandler(event) {
+    event.preventDefault();
+    const form = {};
+    for (let key in this.state.form) {
+      form[key] = this.state.form[key].element.value
+    }
+    console.log(form);
   }
 
   render() {
@@ -93,7 +133,7 @@ class App extends Component {
     
     return (
       <div className="App">
-        <Form>
+        <Form formSubmit={this.formSubmitHandler.bind(this)}>
           {formElements}
         </Form>
       </div>
